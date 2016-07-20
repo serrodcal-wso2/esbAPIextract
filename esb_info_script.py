@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, re
 
 def get_xml_file(files):
     res = list()
@@ -22,8 +22,35 @@ def get_list_of_api_info(directory, xml_files):
         apis_info.append(api_info)
     return apis_info
 
+def get_name(match):
+    name = re.search("name=\"(.*?)\"", match)
+    return name.group(1)
+
+def get_context(match):
+    name = re.search("context=\"(.*?)\"", match)
+    return name.group(1)
+
+def get_resources(match):
+    return list()
+
 def extract_info(api_content):
-    return None
+    res = {
+        'name':'',
+        'context':'',
+        'resources':[],
+        'templates':{},
+        'sequences':{},
+        'registers':{},
+        'stores':{}
+    }
+
+    #matches = re.search("(<api )(.*?)(name=\"(.*?)\")(.*?)(context=\"(.*?)\")",api_content)
+    matches = re.search("<api (.*?)>(.*?)</api>", api_content)
+    if matches:
+        res['name'] = get_name(matches.group(1))
+        res['context'] = get_context(matches.group(1))
+        res['resources'] = get_resources(matches.group(2))
+    return res
 
 def parse_info_to_json(apis_info):
     return None
