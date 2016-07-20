@@ -37,16 +37,22 @@ def remove_internal_if_exists(value):
     else:
         return value
 
+def get_templates_by_resource(resource):
+    templates_matches = re.findall("<call-template target=\"(.*?)\"\/?>", resource)
+    return templates_matches
+
 def get_resources(match):
-    res = list()
+    res_resources = list()
+    res_templates_by_resource = list()
     resources = re.findall("<resource .*?>(.*?)</resource>", match)
     for resource in resources:
         uri_match = re.search("value=\"\[API\](.*?)\"", resource)
         if uri_match:
             value = uri_match.group(1)
             uri = remove_internal_if_exists(value)
-            res.append(uri)
-    return res
+            res_resources.append(uri)
+        res_templates_by_resource.append(get_templates_by_resource(resource))
+    return (res_resources, res_templates_by_resource)
 
 def extract_info(api_content):
     res = {
@@ -64,7 +70,12 @@ def extract_info(api_content):
     if matches:
         res['name'] = get_name(matches.group(1))
         res['context'] = get_context(matches.group(1))
-        res['resources'] = get_resources(matches.group(2))
+        ttuple = get_resources(matches.group(2))
+        res['resources'] = ttuple[0]
+        for i in range(0, len(ttuple[0])):
+            template_dict = dict()
+            template_dict[ttuple[0][i]] = ttuple[1][i]
+            res['templates'] = template_dict
         print(res)
     return res
 
@@ -90,4 +101,3 @@ if __name__ == '__main__':
             print("Argument is not a valid directory path")
     else:
         print("There are not arguments")
-
