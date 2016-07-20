@@ -41,9 +41,14 @@ def get_templates_by_resource(resource):
     templates_matches = re.findall("<call-template target=\"(.*?)\"\/?>", resource)
     return templates_matches
 
+def get_sequences_by_resource(resource):
+    sequences_matches = re.findall("<sequence key=\"(.*?)\"\/?>", resource)
+    return sequences_matches
+
 def get_resources(match):
     res_resources = list()
     res_templates_by_resource = list()
+    res_sequences_by_resource = list()
     resources = re.findall("<resource .*?>(.*?)</resource>", match)
     for resource in resources:
         uri_match = re.search("value=\"\[API\](.*?)\"", resource)
@@ -51,8 +56,10 @@ def get_resources(match):
             value = uri_match.group(1)
             uri = remove_internal_if_exists(value)
             res_resources.append(uri)
+        #TODO: poner un control, para si las listas son vacias, no anada nada al diccionario
         res_templates_by_resource.append(get_templates_by_resource(resource))
-    return (res_resources, res_templates_by_resource)
+        res_sequences_by_resource.append(get_sequences_by_resource(resource))
+    return (res_resources, res_templates_by_resource, res_sequences_by_resource)
 
 def extract_info(api_content):
     res = {
@@ -62,7 +69,8 @@ def extract_info(api_content):
         'templates':{},
         'sequences':{},
         'registers':{},
-        'stores':{}
+        'stores':{},
+        'processors':{}
     }
 
     #matches = re.search("(<api )(.*?)(name=\"(.*?)\")(.*?)(context=\"(.*?)\")",api_content)
@@ -73,9 +81,12 @@ def extract_info(api_content):
         ttuple = get_resources(matches.group(2))
         res['resources'] = ttuple[0]
         template_dict = dict()
+        sequence_dict = dict()
         for i in range(0, len(ttuple[0])):
             template_dict[ttuple[0][i]] = list(set(ttuple[1][i]))
+            sequence_dict[ttuple[0][i]] = list(set(ttuple[2][i]))
         res['templates'] = template_dict
+        res['sequences'] = sequence_dict
         #print(res)
     return res
 
