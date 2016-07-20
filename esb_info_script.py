@@ -45,10 +45,15 @@ def get_sequences_by_resource(resource):
     sequences_matches = re.findall("<sequence key=\"(.*?)\".*?/?>", resource)
     return sequences_matches
 
+def get_endpoints_by_resource(resource):
+    endpoints_matches = re.findall("<endpoint key=\"(.*?)\".*?/?>", resource)
+    return endpoints_matches
+
 def get_resources(match):
     res_resources = list()
     res_templates_by_resource = list()
     res_sequences_by_resource = list()
+    res_endpoints_by_resource = list()
     resources = re.findall("<resource .*?>(.*?)</resource>", match)
     for resource in resources:
         uri_match = re.search("value=\"\[API\](.*?)\"", resource)
@@ -58,13 +63,15 @@ def get_resources(match):
             res_resources.append(uri)
         res_templates_by_resource.append(get_templates_by_resource(resource))
         res_sequences_by_resource.append(get_sequences_by_resource(resource))
-    return (res_resources, res_templates_by_resource, res_sequences_by_resource)
+        res_endpoints_by_resource.append(get_endpoints_by_resource(resource))
+    return (res_resources, res_templates_by_resource, res_sequences_by_resource, res_endpoints_by_resource)
 
 def extract_info(api_content):
     res = {
         'name':'',
         'context':'',
         'resources':[],
+        'endpoints':{},
         'templates':{},
         'sequences':{},
         'registers':{},
@@ -81,6 +88,7 @@ def extract_info(api_content):
         res['resources'] = ttuple[0]
         template_dict = dict()
         sequence_dict = dict()
+        endpoint_dict = dict()
         for i in range(0, len(ttuple[0])):
             list_template = ttuple[1][i]
             if list_template and len(list_template)>0:
@@ -88,8 +96,12 @@ def extract_info(api_content):
             list_sequence = ttuple[2][i]
             if list_sequence and len(list_sequence)>0:
                 sequence_dict[ttuple[0][i]] = list(set(list_sequence))
+            list_endpoint = ttuple[3][i]
+            if list_endpoint and len(list_endpoint)>0:
+                endpoint_dict[ttuple[0][i]] = list(set(list_endpoint))
         res['templates'] = template_dict
         res['sequences'] = sequence_dict
+        res['endpoints'] = endpoint_dict
         #print(res)
     return res
 
