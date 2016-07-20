@@ -5,7 +5,7 @@ def get_xml_file(files):
     for file in files:
         if file.endswith(".xml"):
             res.append(file)
-            #break
+            break
     return res
 
 def get_file_content_into_string(directory, file):
@@ -72,11 +72,11 @@ def extract_info(api_content):
         res['context'] = get_context(matches.group(1))
         ttuple = get_resources(matches.group(2))
         res['resources'] = ttuple[0]
+        template_dict = dict()
         for i in range(0, len(ttuple[0])):
-            template_dict = dict()
-            template_dict[ttuple[0][i]] = ttuple[1][i]
-            res['templates'] = template_dict
-        print(res)
+            template_dict[ttuple[0][i]] = list(set(ttuple[1][i]))
+        res['templates'] = template_dict
+        #print(res)
     return res
 
 def save_object(obj, filename):
