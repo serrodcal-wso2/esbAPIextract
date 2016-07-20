@@ -5,6 +5,7 @@ def get_xml_file(files):
     for file in files:
         if file.endswith(".xml"):
             res.append(file)
+            #break
     return res
 
 def get_file_content_into_string(directory, file):
@@ -27,11 +28,25 @@ def get_name(match):
     return name.group(1)
 
 def get_context(match):
-    name = re.search("context=\"(.*?)\"", match)
-    return name.group(1)
+    context = re.search("context=\"(.*?)\"", match)
+    return context.group(1)
+
+def remove_internal_if_exists(value):
+    if "[INTERNAL]" in value:
+        return value.replace("[INTERNAL] ","")
+    else:
+        return value
 
 def get_resources(match):
-    return list()
+    res = list()
+    resources = re.findall("<resource .*?>(.*?)</resource>", match)
+    for resource in resources:
+        uri_match = re.search("value=\"\[API\](.*?)\"", resource)
+        if uri_match:
+            value = uri_match.group(1)
+            uri = remove_internal_if_exists(value)
+            res.append(uri)
+    return res
 
 def extract_info(api_content):
     res = {
@@ -50,6 +65,7 @@ def extract_info(api_content):
         res['name'] = get_name(matches.group(1))
         res['context'] = get_context(matches.group(1))
         res['resources'] = get_resources(matches.group(2))
+        print(res)
     return res
 
 def parse_info_to_json(apis_info):
