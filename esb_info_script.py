@@ -5,7 +5,7 @@ def get_xml_file(files):
     for file in files:
         if file.endswith(".xml"):
             res.append(file)
-            break
+            #break
     return res
 
 def get_file_content_into_string(directory, file):
@@ -38,11 +38,11 @@ def remove_internal_if_exists(value):
         return value
 
 def get_templates_by_resource(resource):
-    templates_matches = re.findall("<call-template target=\"(.*?)\"\/?>", resource)
+    templates_matches = re.findall("<call-template target=\"(.*?)\".*?/?>", resource)
     return templates_matches
 
 def get_sequences_by_resource(resource):
-    sequences_matches = re.findall("<sequence key=\"(.*?)\"\/?>", resource)
+    sequences_matches = re.findall("<sequence key=\"(.*?)\".*?/?>", resource)
     return sequences_matches
 
 def get_resources(match):
@@ -56,7 +56,6 @@ def get_resources(match):
             value = uri_match.group(1)
             uri = remove_internal_if_exists(value)
             res_resources.append(uri)
-        #TODO: poner un control, para si las listas son vacias, no anada nada al diccionario
         res_templates_by_resource.append(get_templates_by_resource(resource))
         res_sequences_by_resource.append(get_sequences_by_resource(resource))
     return (res_resources, res_templates_by_resource, res_sequences_by_resource)
@@ -83,8 +82,12 @@ def extract_info(api_content):
         template_dict = dict()
         sequence_dict = dict()
         for i in range(0, len(ttuple[0])):
-            template_dict[ttuple[0][i]] = list(set(ttuple[1][i]))
-            sequence_dict[ttuple[0][i]] = list(set(ttuple[2][i]))
+            list_template = ttuple[1][i]
+            if list_template and len(list_template)>0:
+                template_dict[ttuple[0][i]] = list(set(list_template))
+            list_sequence = ttuple[2][i]
+            if list_sequence and len(list_sequence)>0:
+                sequence_dict[ttuple[0][i]] = list(set(list_sequence))
         res['templates'] = template_dict
         res['sequences'] = sequence_dict
         #print(res)
