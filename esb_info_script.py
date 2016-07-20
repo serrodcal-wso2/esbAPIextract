@@ -1,4 +1,4 @@
-import sys, os, re
+import sys, os, re, json
 
 def get_xml_file(files):
     res = list()
@@ -79,11 +79,12 @@ def extract_info(api_content):
         print(res)
     return res
 
-def parse_info_to_json(apis_info):
-    return None
+def save_object(obj, filename):
+    with open(filename, 'w') as outfile:
+        json.dump(obj, outfile)
 
 def put_json_in_this_directory(apis_json):
-    var = None
+    save_object(apis_json, "result.json")
 
 if __name__ == '__main__':
     if len(sys.argv)>1:
@@ -93,8 +94,8 @@ if __name__ == '__main__':
             if files and len(files)>0:
                 xml_files = get_xml_file(files)
                 apis_info = get_list_of_api_info(directory_path, xml_files)
-                apis_json = parse_info_to_json(apis_info)
-                put_json_in_this_directory(apis_json)
+
+                put_json_in_this_directory(apis_info)
             else:
                 print("There are not any file in this directory")
         else:
