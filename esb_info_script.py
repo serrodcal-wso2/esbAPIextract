@@ -53,12 +53,22 @@ def get_registers_by_resource(resource):
     registers_matches = re.findall("expression=\"get-property\('registry','(conf:/.*?)'\)\"", resource)
     return registers_matches
 
+def get_stores_by_resource(resource):
+    sources_matches = re.findall("<messageStore.*?name=\"(.*?)\".*?\/?>", resource)
+    return sources_matches
+
+def get_processor_by_resource(resource):
+    processor_matches = re.findall("<messageProcessor.*?name=\"(.*?)\".*?\/?>", resource)
+    return processor_matches
+
 def get_resources(match):
     res_resources = list()
     res_templates_by_resource = list()
     res_sequences_by_resource = list()
     res_endpoints_by_resource = list()
     res_registers_by_resource = list()
+    res_stores_by_resource = list()
+    res_processor_by_resource = list()
     resources = re.findall("<resource .*?>(.*?)</resource>", match)
     for resource in resources:
         uri_match = re.search("value=\"\[API\](.*?)\"", resource)
@@ -70,7 +80,9 @@ def get_resources(match):
         res_sequences_by_resource.append(get_sequences_by_resource(resource))
         res_endpoints_by_resource.append(get_endpoints_by_resource(resource))
         res_registers_by_resource.append(get_registers_by_resource(resource))
-    return (res_resources, res_templates_by_resource, res_sequences_by_resource, res_endpoints_by_resource, res_registers_by_resource)
+        res_stores_by_resource.append(get_stores_by_resource(resource))
+        res_processor_by_resource.append(get_processor_by_resource(resource))
+    return (res_resources, res_templates_by_resource, res_sequences_by_resource, res_endpoints_by_resource, res_registers_by_resource, res_stores_by_resource, res_processor_by_resource)
 
 def extract_info(api_content):
     res = {
@@ -96,6 +108,8 @@ def extract_info(api_content):
         sequence_dict = dict()
         endpoint_dict = dict()
         register_dict = dict()
+        store_dict = dict()
+        processor_dict = dict()
         for i in range(0, len(ttuple[0])):
             list_template = ttuple[1][i]
             if list_template and len(list_template)>0:
@@ -109,10 +123,18 @@ def extract_info(api_content):
             list_register = ttuple[4][i]
             if list_register and len(list_register)>0:
                 register_dict[ttuple[0][i]] = list(set(list_register))
+            list_store = ttuple[5][i]
+            if list_store and len(list_store)>0:
+                store_dict[ttuple[0][i]] = list(set(list_store))
+            list_processor = ttuple[6][i]
+            if list_processor and len(list_processor)>0:
+                processor_dict[ttuple[0][i]] = list(set(list_processor))
         res['templates'] = template_dict
         res['sequences'] = sequence_dict
         res['endpoints'] = endpoint_dict
         res['registers'] = register_dict
+        res['stores'] = store_dict
+        res['processors'] = processor_dict
         #print(res)
     return res
 
