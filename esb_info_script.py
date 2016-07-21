@@ -49,11 +49,16 @@ def get_endpoints_by_resource(resource):
     endpoints_matches = re.findall("<endpoint key=\"(.*?)\".*?/?>", resource)
     return endpoints_matches
 
+def get_registers_by_resource(resource):
+    registers_matches = re.findall("expression=\"get-property\('registry','(conf:/.*?)'\)\"", resource)
+    return registers_matches
+
 def get_resources(match):
     res_resources = list()
     res_templates_by_resource = list()
     res_sequences_by_resource = list()
     res_endpoints_by_resource = list()
+    res_registers_by_resource = list()
     resources = re.findall("<resource .*?>(.*?)</resource>", match)
     for resource in resources:
         uri_match = re.search("value=\"\[API\](.*?)\"", resource)
@@ -64,7 +69,8 @@ def get_resources(match):
         res_templates_by_resource.append(get_templates_by_resource(resource))
         res_sequences_by_resource.append(get_sequences_by_resource(resource))
         res_endpoints_by_resource.append(get_endpoints_by_resource(resource))
-    return (res_resources, res_templates_by_resource, res_sequences_by_resource, res_endpoints_by_resource)
+        res_registers_by_resource.append(get_registers_by_resource(resource))
+    return (res_resources, res_templates_by_resource, res_sequences_by_resource, res_endpoints_by_resource, res_registers_by_resource)
 
 def extract_info(api_content):
     res = {
@@ -89,6 +95,7 @@ def extract_info(api_content):
         template_dict = dict()
         sequence_dict = dict()
         endpoint_dict = dict()
+        register_dict = dict()
         for i in range(0, len(ttuple[0])):
             list_template = ttuple[1][i]
             if list_template and len(list_template)>0:
@@ -99,9 +106,13 @@ def extract_info(api_content):
             list_endpoint = ttuple[3][i]
             if list_endpoint and len(list_endpoint)>0:
                 endpoint_dict[ttuple[0][i]] = list(set(list_endpoint))
+            list_register = ttuple[4][i]
+            if list_register and len(list_register)>0:
+                register_dict[ttuple[0][i]] = list(set(list_register))
         res['templates'] = template_dict
         res['sequences'] = sequence_dict
         res['endpoints'] = endpoint_dict
+        res['registers'] = register_dict
         #print(res)
     return res
 
@@ -120,7 +131,6 @@ if __name__ == '__main__':
             if files and len(files)>0:
                 xml_files = get_xml_file(files)
                 apis_info = get_list_of_api_info(directory_path, xml_files)
-
                 put_json_in_this_directory(apis_info)
             else:
                 print("There are not any file in this directory")
