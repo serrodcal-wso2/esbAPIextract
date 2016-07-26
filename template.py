@@ -8,6 +8,9 @@ def get_xml_file(files):
             #break
     return res
 
+def get_list_of_template_info(directory, xml_files):
+    return None
+
 def save_object(obj, filename):
     with open(filename, 'w') as outfile:
         json.dump(obj, outfile)

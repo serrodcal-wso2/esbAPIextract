@@ -8,6 +8,9 @@ def get_xml_file(files):
             #break
     return res
 
+def get_list_of_sequence_info(directory, xml_files):
+    return None
+
 def save_object(obj, filename):
     with open(filename, 'w') as outfile:
         json.dump(obj, outfile)
@@ -22,7 +25,7 @@ if __name__ == '__main__':
             files = os.listdir(directory_path)
             if files and len(files)>0:
                 xml_files = get_xml_file(files)
-                apis_info = get_list_of_template_info(directory_path, xml_files)
+                apis_info = get_list_of_sequence_info(directory_path, xml_files)
                 put_json_in_this_directory(apis_info)
             else:
                 print("There are not any file in this directory")
