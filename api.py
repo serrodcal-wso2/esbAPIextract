@@ -143,7 +143,7 @@ def save_object(obj, filename):
         json.dump(obj, outfile)
 
 def put_json_in_this_directory(apis_json):
-    save_object(apis_json, "result.json")
+    save_object(apis_json, "api_result.json")
 
 if __name__ == '__main__':
     if len(sys.argv)>1:
