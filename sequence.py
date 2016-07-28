@@ -59,19 +59,17 @@ def get_resources(match):
     res_registers_by_resource = list()
     res_stores_by_resource = list()
     res_processor_by_resource = list()
-    sequence = re.findall("(.*?)", match)
-    for resource in sequence:
-        uri_match = re.search("value=\"\[Sequence\](.*?)\"", resource)
-        if uri_match:
-            value = uri_match.group(1)
-            #uri = remove_internal_if_exists(value)
-            res_templates.append(value)
-        res_templates_by_resource.append(get_templates_by_resource(resource))
-        res_sequences_by_resource.append(get_sequences_by_resource(resource))
-        res_endpoints_by_resource.append(get_endpoints_by_resource(resource))
-        res_registers_by_resource.append(get_registers_by_resource(resource))
-        res_stores_by_resource.append(get_stores_by_resource(resource))
-        res_processor_by_resource.append(get_processor_by_resource(resource))
+    uri_match = re.search("value=\"\[Sequence\](.*?)\"", match)
+    if uri_match:
+        value = uri_match.group(1)
+        #uri = remove_internal_if_exists(value)
+        res_templates.append(value)
+    res_templates_by_resource.append(get_templates_by_resource(match))
+    res_sequences_by_resource.append(get_sequences_by_resource(match))
+    res_endpoints_by_resource.append(get_endpoints_by_resource(match))
+    res_registers_by_resource.append(get_registers_by_resource(match))
+    res_stores_by_resource.append(get_stores_by_resource(match))
+    res_processor_by_resource.append(get_processor_by_resource(match))
     return (res_templates, res_templates_by_resource, res_sequences_by_resource, res_endpoints_by_resource, res_registers_by_resource, res_stores_by_resource, res_processor_by_resource)
 
 def extract_info(template_content):
